@@ -1,5 +1,3 @@
-![001](https://github.com/Bodrami/Practice_Template/assets/149561287/c8f36c21-0cdc-406c-a842-00768ee2980c)
-
 <div align="right">
 
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fbeyond-sw-camp%2Fbe04-4th-PI-MoodHolic.git&count_bg=%23006EFF&title_bg=%23767676&icon=keybase.svg&icon_color=%23E7E7E7&title=Today&edge_flat=false)](https://hits.seeyoufarm.com)
@@ -142,15 +140,6 @@
 * vue-chart - 통계, 수치를 표로 출력하기 위한 API
 * react native - 페이스북에서 만든 오픈소스 모바일 애플리케이션 프레임워크로 구현한 웹을 앱으로 구현
 
-# 🌅 일정관리 (Sprint Kanban)
-
-### ⏰ Sprint Kanban 1주차
-![image](https://github.com/Bodrami/Practice_Template/assets/149561287/11c62c6d-9e3d-4671-91a7-f3dc4040cf54)
-
-</br>
-
-### ⏰ Sprint Kanban 2주차
-![image](https://github.com/Bodrami/Practice_Template/assets/149561287/ae2f3747-8762-4fbc-a350-996fc0f4df45)
 
 </br>
 
