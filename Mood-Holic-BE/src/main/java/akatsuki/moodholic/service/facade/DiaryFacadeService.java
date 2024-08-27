@@ -29,7 +29,7 @@ import java.util.List;
 @Service
 public class DiaryFacadeService {
     private final DiaryService diaryService;
-    private final ChatGPTService chatGPTService;
+//    private final ChatGPTService chatGPTService;
     private final DiaryFoodService diaryFoodService;
     private final DiaryEmotionService diaryEmotionService;
     private final DiaryMovieService diaryMovieService;
@@ -39,9 +39,11 @@ public class DiaryFacadeService {
     private final MovieService movieService;
     private final MusicService musicService;
     @Autowired
-    public DiaryFacadeService(DiaryService diaryService, ChatGPTService chatGPTService, DiaryFoodService diaryFoodService, DiaryEmotionService diaryEmotionService, DiaryMovieService diaryMovieService, DiaryMusicService diaryMusicService, CommentService commentService, FoodService foodService, MovieService movieService, MusicService musicService) {
+    public DiaryFacadeService(DiaryService diaryService
+//                              ,ChatGPTService chatGPTService
+            , DiaryFoodService diaryFoodService, DiaryEmotionService diaryEmotionService, DiaryMovieService diaryMovieService, DiaryMusicService diaryMusicService, CommentService commentService, FoodService foodService, MovieService movieService, MusicService musicService) {
         this.diaryService = diaryService;
-        this.chatGPTService = chatGPTService;
+//        this.chatGPTService = chatGPTService;
         this.diaryFoodService = diaryFoodService;
         this.diaryEmotionService = diaryEmotionService;
         this.diaryMovieService = diaryMovieService;
@@ -98,7 +100,8 @@ public class DiaryFacadeService {
         ResponseDiaryPost prompt=diaryService.postDiary(requestdiary);
 
         if(!prompt.getResponse().equals("임시저장") && !prompt.getResponse().equals("중복")) {
-            DataParse response = chatGPTService.Response(prompt.getResponse());
+//            DataParse response = chatGPTService.Response(prompt.getResponse());
+            DataParse response = null;
             saveGPTResponse(requestdiary.getMember().getMemberId(), response, requestdiary);
         }
         return prompt;
