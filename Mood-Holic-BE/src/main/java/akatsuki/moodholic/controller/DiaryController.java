@@ -3,6 +3,7 @@ package akatsuki.moodholic.controller;
 import akatsuki.moodholic.domain.*;
 import akatsuki.moodholic.dto.ResponseDiary;
 import akatsuki.moodholic.dto.ResponseDiaryPost;
+import akatsuki.moodholic.request.RequestPostDiary;
 import akatsuki.moodholic.service.facade.DiaryFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +34,7 @@ public class DiaryController {
     @PostMapping("")
     @Operation(summary = "다이어리 저장", description = "요청온 다이어리의 상태에 따라 임시 저장 또는 저장을 수행합니다. " +
             "저장 시 ChatGPT에 프롬프트 전달하여 GPT의 응답을 받아 DB에 저장합니다.")
-    public ResponseEntity<ResponseDiaryPost> postDiary(@RequestBody Diary diary){
+    public ResponseEntity<ResponseDiaryPost> postDiary(@RequestBody RequestPostDiary diary){
         ResponseDiaryPost response = facadeService.postDiary(diary);
         return ResponseEntity.ok().body(response);
     }

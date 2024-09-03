@@ -1,6 +1,6 @@
 server:
 #  port: 443
-  port: 8888
+  port: 8899
 #  ssl:
 #    key-store: classpath:keystore.p12
 #    key-store-password: changeit

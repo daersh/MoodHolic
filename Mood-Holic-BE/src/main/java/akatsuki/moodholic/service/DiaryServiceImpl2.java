@@ -1,8 +1,12 @@
 package akatsuki.moodholic.service;
 
+import akatsuki.moodholic.config.DateParsing;
 import akatsuki.moodholic.domain.Diary;
+import akatsuki.moodholic.domain.Member;
 import akatsuki.moodholic.dto.ResponseDiaryPost;
 import akatsuki.moodholic.repository.DiaryDAO;
+import akatsuki.moodholic.request.RequestPostDiary;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,41 +16,45 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-@Service
+//@Service
+@RequiredArgsConstructor
 public class DiaryServiceImpl2 implements DiaryService{
     private final DiaryDAO diaryDAO;
 
-    @Autowired
-    public DiaryServiceImpl2(DiaryDAO diaryDAO) {
-        this.diaryDAO = diaryDAO;
-    }
 
     @Override
     @Transactional
-    public ResponseDiaryPost postDiary(Diary requestDiary) {
-        String fullDate = requestDiary.getDate();
+    public ResponseDiaryPost postDiary(RequestPostDiary requestDiary) {
         // 날짜에서 시간 제거하고 LocalDate로 변환
-        LocalDate entryDate = extractDateWithoutTime(fullDate);
-        if (entryDate != null) {
-            String redisKey = "diary:" + requestDiary.getMember().getMemberId() + ":" + entryDate.toString();
-        }
+        LocalDate localDate = LocalDate.now();
+        System.out.println("localDate = " + localDate);
 
-        Diary findDiary = diaryDAO.findByMemberMemberIdAndDate(requestDiary.getMember().getMemberId(),requestDiary.getDate());
+        String redisKey = "diary:" + requestDiary.getMemberId() + ":" + localDate;
+        Diary diary = Diary.builder()
+                .content(requestDiary.getContent())
+                .date(localDate.toString())
+                .member(new Member(requestDiary.getMemberId()))
+                .build();
+
+        Diary findDiary = diaryDAO.findByMemberMemberIdAndDate(requestDiary.getMemberId(),localDate.toString());
+
         if(findDiary!=null){
-            requestDiary.setDiaryId(findDiary.getDiaryId());
             if(findDiary.getStatus()==1){
                 System.out.println("이미 존재하여 생성하지 않습니다.");
                 return new ResponseDiaryPost("중복");
             }
         }
-        requestDiary=diaryDAO.save(requestDiary);
-        if(requestDiary.getStatus()==0){
+
+        diary=diaryDAO.save(diary);
+        if(diary.getStatus()==0){
             System.out.println("임시 저장 완료");
             return new ResponseDiaryPost("임시저장");
         }
+
         String content = requestDiary.getContent();
-        String prompt = getPrompt(requestDiary, content);
-        ResponseDiaryPost returnValue = new ResponseDiaryPost(prompt, requestDiary.getDiaryId());
+        String prompt = getPrompt(diary, content);
+        ResponseDiaryPost returnValue = new ResponseDiaryPost(prompt, diary.getDiaryId());
+
         return returnValue;
     }
     @Override
@@ -103,12 +111,5 @@ public class DiaryServiceImpl2 implements DiaryService{
         return diaryDAO.findById(diaryId).orElseThrow();
     }
 
-    // 날짜에서 시간 제거하고 LocalDate로 변환하는 메서드
-    private LocalDate extractDateWithoutTime(String fullDate) {
-        try {
-            return LocalDate.parse(fullDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate();
-        } catch (DateTimeParseException e) {
-            return null; // 날짜 파싱 실패 시 null 반환
-        }
-    }
+
 }

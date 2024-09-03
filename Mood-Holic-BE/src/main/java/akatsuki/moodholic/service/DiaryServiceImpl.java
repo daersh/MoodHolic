@@ -5,14 +5,17 @@ import akatsuki.moodholic.dto.ResponseDiary;
 import akatsuki.moodholic.dto.ResponseDiaryPost;
 import akatsuki.moodholic.etc.DataParse;
 import akatsuki.moodholic.repository.*;
-import akatsuki.moodholic.service.ChatGPTService;
+import akatsuki.moodholic.request.RequestPostDiary;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Slf4j
 public class  DiaryServiceImpl implements DiaryService{
     private final DiaryDAO diaryDAO;
 
@@ -23,23 +26,34 @@ public class  DiaryServiceImpl implements DiaryService{
 
     @Override
     @Transactional
-    public ResponseDiaryPost postDiary(Diary requestdiary) {
-        Diary findDiary = diaryDAO.findByMemberMemberIdAndDate(requestdiary.getMember().getMemberId(),requestdiary.getDate());
+    public ResponseDiaryPost postDiary(RequestPostDiary requestDiary) {
+        log.info("requestDiary = " + requestDiary);
+        LocalDate localDate = LocalDate.now();
+        log.info("localDate = " + localDate);
+        Diary diary = Diary.builder()
+                .content(requestDiary.getContent())
+                .date(localDate.toString())
+                .member(new Member(requestDiary.getMemberId()))
+                .status(requestDiary.getStatus())
+                .build();
+        Diary findDiary = diaryDAO.findByMemberMemberIdAndDate(requestDiary.getMemberId(),localDate.toString());
+
         if(findDiary!=null){
-            requestdiary.setDiaryId(findDiary.getDiaryId());
             if(findDiary.getStatus()==1){
-                System.out.println("이미 존재하여 생성하지 않습니다.");
+                log.info("이미 존재하여 생성하지 않습니다.");
                 return new ResponseDiaryPost("중복");
             }
+            diary.setDiaryId(findDiary.getDiaryId());
         }
-        requestdiary=diaryDAO.save(requestdiary);
-        if(requestdiary.getStatus()==0){
-            System.out.println("임시 저장 완료");
+
+        diary=diaryDAO.save(diary);
+        if(diary.getStatus()==0){
+            log.info("임시 저장 완료");
             return new ResponseDiaryPost("임시저장");
         }
-        String content = requestdiary.getContent();
-        String prompt = getPrompt(requestdiary, content);
-        ResponseDiaryPost returnValue = new ResponseDiaryPost(prompt, requestdiary.getDiaryId());
+        String content = diary.getContent();
+        String prompt = getPrompt(diary, content);
+        ResponseDiaryPost returnValue = new ResponseDiaryPost(prompt, diary.getDiaryId());
         return returnValue;
     }
     @Override

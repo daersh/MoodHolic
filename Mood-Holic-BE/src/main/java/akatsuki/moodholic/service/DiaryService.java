@@ -3,12 +3,13 @@ package akatsuki.moodholic.service;
 import akatsuki.moodholic.domain.Diary;
 import akatsuki.moodholic.dto.ResponseDiary;
 import akatsuki.moodholic.dto.ResponseDiaryPost;
+import akatsuki.moodholic.request.RequestPostDiary;
 
 import java.util.List;
 
 public interface DiaryService {
 
-    ResponseDiaryPost postDiary(Diary diary);
+    ResponseDiaryPost postDiary(RequestPostDiary diary);
 
     String deleteDiary(int diaryId);
 

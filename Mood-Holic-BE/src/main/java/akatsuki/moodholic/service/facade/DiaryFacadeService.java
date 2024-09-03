@@ -4,6 +4,7 @@ import akatsuki.moodholic.domain.*;
 import akatsuki.moodholic.dto.ResponseDiary;
 import akatsuki.moodholic.dto.ResponseDiaryPost;
 import akatsuki.moodholic.etc.DataParse;
+import akatsuki.moodholic.request.RequestPostDiary;
 import akatsuki.moodholic.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,13 +97,13 @@ public class DiaryFacadeService {
     }
 
     @Transactional
-    public ResponseDiaryPost postDiary(Diary requestdiary) {
+    public ResponseDiaryPost postDiary(RequestPostDiary requestdiary) {
         ResponseDiaryPost prompt=diaryService.postDiary(requestdiary);
 
         if(!prompt.getResponse().equals("임시저장") && !prompt.getResponse().equals("중복")) {
 //            DataParse response = chatGPTService.Response(prompt.getResponse());
             DataParse response = null;
-            saveGPTResponse(requestdiary.getMember().getMemberId(), response, requestdiary);
+//            saveGPTResponse(requestdiary.getMemberId(), response, requestdiary);
         }
         return prompt;
     }
