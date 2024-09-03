@@ -104,6 +104,7 @@ public class DiaryFacadeService {
 //            DataParse response = chatGPTService.Response(prompt.getResponse());
             DataParse response = null;
 //            saveGPTResponse(requestdiary.getMemberId(), response, requestdiary);
+            return null;
         }
         return prompt;
     }

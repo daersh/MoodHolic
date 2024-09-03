@@ -8,6 +8,7 @@ import akatsuki.moodholic.service.facade.DiaryFacadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +37,8 @@ public class DiaryController {
             "저장 시 ChatGPT에 프롬프트 전달하여 GPT의 응답을 받아 DB에 저장합니다.")
     public ResponseEntity<ResponseDiaryPost> postDiary(@RequestBody RequestPostDiary diary){
         ResponseDiaryPost response = facadeService.postDiary(diary);
+        if(response==null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         return ResponseEntity.ok().body(response);
     }
 

@@ -27,9 +27,34 @@ services:
     networks:
       - my_network
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-container
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Prometheus 설정 파일 마운트
+    ports:
+      - "9090:9090"
+    networks:
+      - my_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-container
+    ports:
+      - "3100:3000"  # Grafana의 포트를 3100으로 변경
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Grafana 관리자 비밀번호
+    networks:
+      - my_network
+    volumes:
+      - grafana_data:/var/lib/grafana
+
 volumes:
   mariadb_data:
   redis_data:
+  prometheus_data:
+  grafana_data:
 
 networks:
   my_network:

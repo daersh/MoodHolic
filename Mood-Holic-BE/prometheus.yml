@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s  # 메트릭 수집 주기
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'mariadb'
+    static_configs:
+      - targets: ['mariadb-container:3306']  # 컨테이너 이름 사용
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-container:6379']  # 컨테이너 이름 사용
+
+  - job_name: 'my_project'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8899']  # 호스트 머신 접근

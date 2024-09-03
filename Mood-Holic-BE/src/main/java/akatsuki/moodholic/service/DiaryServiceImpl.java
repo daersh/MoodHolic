@@ -6,6 +6,7 @@ import akatsuki.moodholic.dto.ResponseDiaryPost;
 import akatsuki.moodholic.etc.DataParse;
 import akatsuki.moodholic.repository.*;
 import akatsuki.moodholic.request.RequestPostDiary;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,8 @@ public class  DiaryServiceImpl implements DiaryService{
     }
 
     @Override
-    @Transactional
+    @Synchronized
+//    @Transactional
     public ResponseDiaryPost postDiary(RequestPostDiary requestDiary) {
         log.info("requestDiary = " + requestDiary);
         LocalDate localDate = LocalDate.now();
