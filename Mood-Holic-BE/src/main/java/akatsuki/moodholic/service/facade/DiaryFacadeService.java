@@ -8,6 +8,7 @@ import akatsuki.moodholic.request.RequestPostDiary;
 import akatsuki.moodholic.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.List;
 @Service
 public class DiaryFacadeService {
     private final DiaryService diaryService;
-//    private final ChatGPTService chatGPTService;
+    private final ChatGPTService chatGPTService;
     private final DiaryFoodService diaryFoodService;
     private final DiaryEmotionService diaryEmotionService;
     private final DiaryMovieService diaryMovieService;
@@ -41,10 +42,10 @@ public class DiaryFacadeService {
     private final MusicService musicService;
     @Autowired
     public DiaryFacadeService(DiaryService diaryService
-//                              ,ChatGPTService chatGPTService
+                              ,ChatGPTService chatGPTService
             , DiaryFoodService diaryFoodService, DiaryEmotionService diaryEmotionService, DiaryMovieService diaryMovieService, DiaryMusicService diaryMusicService, CommentService commentService, FoodService foodService, MovieService movieService, MusicService musicService) {
         this.diaryService = diaryService;
-//        this.chatGPTService = chatGPTService;
+        this.chatGPTService = chatGPTService;
         this.diaryFoodService = diaryFoodService;
         this.diaryEmotionService = diaryEmotionService;
         this.diaryMovieService = diaryMovieService;
@@ -96,21 +97,20 @@ public class DiaryFacadeService {
         return "삭제 완료";
     }
 
-    @Transactional
+
     public ResponseDiaryPost postDiary(RequestPostDiary requestdiary) {
         ResponseDiaryPost prompt=diaryService.postDiary(requestdiary);
 
         if(!prompt.getResponse().equals("임시저장") && !prompt.getResponse().equals("중복")) {
-//            DataParse response = chatGPTService.Response(prompt.getResponse());
-            DataParse response = null;
-//            saveGPTResponse(requestdiary.getMemberId(), response, requestdiary);
+
+            DataParse response = chatGPTService.Response(prompt.getResponse());
+            saveGPTResponse(response, prompt.getDirayId() );
             return null;
         }
         return prompt;
     }
 
-    private int saveGPTResponse(long memberId, DataParse response, Diary diary) {
-        System.out.println("response = " + response);
+    private void saveGPTResponse(DataParse response, int diaryId) {
         Food food = foodService.findFoodByFoodName(response.getFood().getFoodName());
         Movie movie = movieService.findByMovieName(response.getMovie().getMovieName());
         Music music = musicService.findByMusicName(response.getMusic().getMusicName());
@@ -120,11 +120,13 @@ public class DiaryFacadeService {
             movie=movieService.saveMovie(response.getMovie());
         if(music==null)
             music=musicService.saveMusic(response.getMusic());
-        save(response, diary, food, movie, music);
-        return 0;
+        save(response, food, movie, music, diaryId);
     }
 
-    private void save(DataParse response, Diary diary, Food food, Movie movie, Music music) {
+    private void save(DataParse response, Food food, Movie movie, Music music, int diaryId) {
+        Diary diary = Diary.builder().
+                diaryId(diaryId).
+                build();
         diaryFoodService.saveDiaryFood(new DiaryFood(diary, food,false));
         diaryMovieService.saveDiaryMovie(new DiaryMovie(diary, movie,false));
         diaryMusicService.saveDiaryMusic(new DiaryMusic(diary, music,false));

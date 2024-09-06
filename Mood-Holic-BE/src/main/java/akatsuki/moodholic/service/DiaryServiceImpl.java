@@ -10,6 +10,7 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -26,12 +27,11 @@ public class  DiaryServiceImpl implements DiaryService{
     }
 
     @Override
-    @Synchronized
-//    @Transactional
+    //@Synchronized
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public ResponseDiaryPost postDiary(RequestPostDiary requestDiary) {
-        log.info("requestDiary = " + requestDiary);
+
         LocalDate localDate = LocalDate.now();
-        log.info("localDate = " + localDate);
         Diary diary = Diary.builder()
                 .content(requestDiary.getContent())
                 .date(localDate.toString())
@@ -42,7 +42,6 @@ public class  DiaryServiceImpl implements DiaryService{
 
         if(findDiary!=null){
             if(findDiary.getStatus()==1){
-                log.info("이미 존재하여 생성하지 않습니다.");
                 return new ResponseDiaryPost("중복");
             }
             diary.setDiaryId(findDiary.getDiaryId());
@@ -50,13 +49,10 @@ public class  DiaryServiceImpl implements DiaryService{
 
         diary=diaryDAO.save(diary);
         if(diary.getStatus()==0){
-            log.info("임시 저장 완료");
             return new ResponseDiaryPost("임시저장");
         }
-        String content = diary.getContent();
-        String prompt = getPrompt(diary, content);
-        ResponseDiaryPost returnValue = new ResponseDiaryPost(prompt, diary.getDiaryId());
-        return returnValue;
+        String prompt = getPrompt(diary, diary.getContent());
+        return new ResponseDiaryPost(prompt, diary.getDiaryId());
     }
     @Override
     public Diary findDiary(int diaryId){
