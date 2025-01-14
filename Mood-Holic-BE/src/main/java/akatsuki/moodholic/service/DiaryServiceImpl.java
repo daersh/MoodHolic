@@ -28,6 +28,7 @@ public class  DiaryServiceImpl implements DiaryService{
 
     @Override
     //@Synchronized
+    // 격리 수준 되돌릴 것
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public ResponseDiaryPost postDiary(RequestPostDiary requestDiary) {
 
@@ -38,6 +39,8 @@ public class  DiaryServiceImpl implements DiaryService{
                 .member(new Member(requestDiary.getMemberId()))
                 .status(requestDiary.getStatus())
                 .build();
+        
+        // 유니크 키를 통해 조회하도록 변경(유니크 키 인덱싱 처리되어 있음)
         Diary findDiary = diaryDAO.findByMemberMemberIdAndDate(requestDiary.getMemberId(),localDate.toString());
 
         if(findDiary!=null){
