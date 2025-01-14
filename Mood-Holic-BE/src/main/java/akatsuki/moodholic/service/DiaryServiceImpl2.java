@@ -36,8 +36,9 @@ public class DiaryServiceImpl2 implements DiaryService{
                 .member(new Member(requestDiary.getMemberId()))
                 .build();
 
+        // 유니크키를 통해 중복 처리하는 경우 해당 부분을 유니크키로 찾도록 할 것(유니크키가 인덱스로 설정되어 있기 때문)  
         Diary findDiary = diaryDAO.findByMemberMemberIdAndDate(requestDiary.getMemberId(),localDate.toString());
-
+        
         if(findDiary!=null){
             if(findDiary.getStatus()==1){
                 System.out.println("이미 존재하여 생성하지 않습니다.");
